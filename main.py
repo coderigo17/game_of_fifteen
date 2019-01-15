@@ -8,7 +8,7 @@ b = Board()
 def main():
     # Randomize board and update display on screen to show board
     b.shuffle()
-    b.refresh(beginning=True)
+    b.refresh()
 
     # https://pypi.org/project/pynput/
     # Collect events until released (cancel by returning False from on_press or on_release)

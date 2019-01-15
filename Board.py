@@ -67,12 +67,12 @@ class Board:
     def move_left(self):
         self.move(0, -1)
 
-    def refresh(self, beginning=False):
+    def refresh(self):
         """Clears screen, prints board, checks if game is over"""
 
         system("clear")
         print(self)
-        if not beginning and self.goal == self.board:
+        if self.goal == self.board:
             print("Congrats! You won! ")
             return False
 
