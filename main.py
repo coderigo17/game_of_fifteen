@@ -1,7 +1,6 @@
 from pynput import keyboard
 
 from Board import Board
-from GameOver import GameOver
 
 # Create game board
 b = Board()
@@ -12,17 +11,11 @@ def main():
     b.refresh(beginning=True)
 
     # https://pypi.org/project/pynput/
-    # Collect events until released
+    # Collect events until released (cancel by returning False from on_press or on_release)
     with keyboard.Listener(
             on_press=on_press,
             on_release=on_release) as listener:
         listener.join()
-        print("hello")
-
-    # while True:
-    #     if input("Play Again? (y/n) ") == "y":
-    #         main()
-    #     break
 
 
 def on_press(key):
@@ -34,13 +27,10 @@ def on_press(key):
 def on_release(key):
     """Behavior executed on key release"""
 
-    # Escape key solves the game and transitions to "game over" state
+    # Escape key solves the game and quits
     if key == keyboard.Key.esc:
         b.solve()
-        b.refresh()
-
-        # Stop listener
-        return False
+        return b.refresh()
 
     # User can make moves using the arrow keys
     elif key == keyboard.Key.up:
@@ -53,7 +43,7 @@ def on_release(key):
         b.move_left()
 
     # Update display on screen to show board after most recent move
-    b.refresh()
+    return b.refresh()
 
 
 if __name__ == '__main__':

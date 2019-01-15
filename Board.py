@@ -2,10 +2,8 @@ from copy import deepcopy
 from os import system
 from random import randint, seed
 
-from GameOver import GameOver
-
-MAX_COL = 3
-MAX_ROW = 3
+MAX_COL = 4
+MAX_ROW = 4
 SHUFFLE_MAGNITUDE = 10000
 
 class Board:
@@ -24,7 +22,7 @@ class Board:
         self.board = deepcopy(self.goal)
 
         # The location of the empty space [row_index, column_index]; [3,3] by default
-        self.loc = [MAX_ROW, MAX_COL]
+        self.loc = [MAX_ROW - 1, MAX_COL - 1]
 
         # Map of moves by index (useful for randomization)
         self.moves = {0: self.move_up, 1: self.move_right, 2: self.move_down, 3: self.move_left}
@@ -33,8 +31,8 @@ class Board:
         """Renders the board on the screen"""
 
         print("Welcome to the game of fifteen!\n")
-        for i in range(MAX_ROW + 1):
-            for j in range(MAX_COL + 1):
+        for i in range(MAX_ROW):
+            for j in range(MAX_COL):
                 print(self.board[i][j], end=" ")
             print()
 
@@ -74,17 +72,27 @@ class Board:
 
         system("clear")
         print(self)
-        # if not beginning and self.goal == self.board:
-        #     self.goal = []
-        #     raise GameOver
+        if not beginning and self.goal == self.board:
+            print("Congrats! You won! ")
+            return False
+
+        return True
 
     def shuffle(self):
         """Randomizes the board using a succession of legal moves from a solved state"""
 
+        # Do some number of random moves
         seed()
         for i in range(SHUFFLE_MAGNITUDE):
             m = randint(0, 3)
             self.moves[m]()
 
+        # Optionally move the empty space to the lower right corner
+        for i in range(MAX_COL):
+            self.moves[2]()
+        for i in range(MAX_ROW):
+            self.moves[1]()
+
     def solve(self):
+        """Solves the game"""
         self.board = deepcopy(self.goal)
