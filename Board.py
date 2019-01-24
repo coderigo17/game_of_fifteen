@@ -5,12 +5,12 @@ from random import randint, seed
 
 MAX_COL = 4
 MAX_ROW = 4
-SHUFFLE_MAGNITUDE = 20
+SHUFFLE_MAGNITUDE = 5
 
 class Board:
     """Models the board for our game"""
 
-    def __init__(self, board=None):
+    def __init__(self):
         """Initializes the board"""
 
         # The solved board
@@ -20,10 +20,7 @@ class Board:
                         ["13", "14", "15", "__"]]
 
         # The "current" board; we will randomize it using legal moves
-        if not board:
-            self.board = deepcopy(self.goal)
-        else:
-            self.board = board
+        self.board = deepcopy(self.goal)
 
         # The location of the empty space [row_index, column_index]; [3,3] by default
         self.loc = [MAX_ROW - 1, MAX_COL - 1]
@@ -43,33 +40,34 @@ class Board:
         # __repr__ MUST return a string
         return ""
 
-    def move(self, x, y):
+    def move(self, board, loc, x, y):
         """General method for making a move"""
 
         # Prevent user from moving beyond edge of the board
-        if self.loc[0] + x < 0 or self.loc[0] + x > 3 or self.loc[1] + y < 0 or self.loc[1] + y > 3:
-            return
+        if loc[0] + x < 0 or loc[0] + x > 3 or loc[1] + y < 0 or loc[1] + y > 3:
+            return board, loc
 
         # For a legal move, swap the location of the empty space with that of the adjacent number
-        self.board[self.loc[0]][self.loc[1]], self.board[self.loc[0] + x][self.loc[1] + y] \
-        = self.board[self.loc[0] + x][self.loc[1] + y], self.board[self.loc[0]][self.loc[1]]
+        board[loc[0]][loc[1]], board[loc[0] + x][loc[1] + y] \
+        = board[loc[0] + x][loc[1] + y], board[loc[0]][loc[1]]
 
         # Update the location of the empty space
-        self.loc[0] += x
-        self.loc[1] += y
+        loc[0] += x
+        loc[1] += y
 
-    # Make moves by adding/subtracting 1 to corresponding empty space location index
-    def move_up(self):
-        self.move(-1, 0)
+        return board, loc
 
-    def move_right(self):
-        self.move(0, 1)
+    def move_up(self, board, loc):
+        return self.move(board, loc, -1, 0)
 
-    def move_down(self):
-        self.move(1, 0)
+    def move_right(self, board, loc):
+        return self.move(board, loc, 0, 1)
 
-    def move_left(self):
-        self.move(0, -1)
+    def move_down(self, board, loc):
+        return self.move(board, loc, 1, 0)
+
+    def move_left(self, board, loc):
+        return self.move(board, loc, 0, -1)
 
     def refresh(self):
         """Clears screen, prints board, checks if game is over"""
@@ -89,42 +87,13 @@ class Board:
         seed()
         for i in range(SHUFFLE_MAGNITUDE):
             m = randint(0, 3)
-            self.moves[m]()
+            self.moves[m](self.board, self.loc)
 
         # Optionally move the empty space to the lower right corner
         for i in range(MAX_COL):
-            self.moves[2]()
+            self.moves[2](self.board, self.loc)
         for i in range(MAX_ROW):
-            self.moves[1]()
-
-    def ai_move(self, board, loc, x, y):
-        """General method for making a move"""
-
-        # Prevent user from moving beyond edge of the board
-        if loc[0] + x < 0 or loc[0] + x > 3 or loc[1] + y < 0 or loc[1] + y > 3:
-            return board, loc
-
-        # For a legal move, swap the location of the empty space with that of the adjacent number
-        board[loc[0]][loc[1]], board[loc[0] + x][loc[1] + y] \
-        = board[loc[0] + x][loc[1] + y], board[loc[0]][loc[1]]
-
-        # Update the location of the empty space
-        loc[0] += x
-        loc[1] += y
-
-        return board, loc
-
-    def ai_move_up(self, board, loc):
-        return self.ai_move(board, loc, -1, 0)
-
-    def ai_move_right(self, board, loc):
-        return self.ai_move(board, loc, 0, 1)
-
-    def ai_move_down(self, board, loc):
-        return self.ai_move(board, loc, 1, 0)
-
-    def ai_move_left(self, board, loc):
-        return self.ai_move(board, loc, 0, -1)
+            self.moves[1](self.board, self.loc)
 
     def solve(self):
         """Solves the game using breadth-first search"""
@@ -133,10 +102,10 @@ class Board:
         def successors(board, loc):
             b_lst = [deepcopy(board), deepcopy(board), deepcopy(board), deepcopy(board)]
             loc_lst = [list(loc), list(loc), list(loc), list(loc)]
-            b_lst[0], loc_lst[0] = self.ai_move_up(b_lst[0], loc_lst[0])
-            b_lst[1], loc_lst[1] = self.ai_move_right(b_lst[1], loc_lst[1])
-            b_lst[2], loc_lst[2] = self.ai_move_down(b_lst[2], loc_lst[2])
-            b_lst[3], loc_lst[3] = self.ai_move_left(b_lst[3], loc_lst[3])
+            b_lst[0], loc_lst[0] = self.move_up(b_lst[0], loc_lst[0])
+            b_lst[1], loc_lst[1] = self.move_right(b_lst[1], loc_lst[1])
+            b_lst[2], loc_lst[2] = self.move_down(b_lst[2], loc_lst[2])
+            b_lst[3], loc_lst[3] = self.move_left(b_lst[3], loc_lst[3])
 
             return [[b_lst[0], loc_lst[0], 0], [b_lst[1], loc_lst[1], 1], [b_lst[2], loc_lst[2], 2], [b_lst[3], loc_lst[3], 3]]
 

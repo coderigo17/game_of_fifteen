@@ -28,26 +28,31 @@ def on_press(key):
 def on_release(key):
     """Behavior executed on key release"""
 
-    # Escape key solves the game and quits
+    # Escape key quits the game
     if key == keyboard.Key.esc:
-        print("Thinking...")
-        moves = b.solve()
-        cont = True
-        for m in moves:
-            b.moves[m]()
-            cont = b.refresh()
-            sleep(1)
-        return cont
+        return False
 
     # User can make moves using the arrow keys
     elif key == keyboard.Key.up:
-        b.move_up()
+        b.board, b.loc = b.move_up(b.board, b.loc)
     elif key == keyboard.Key.right:
-        b.move_right()
+        b.board, b.loc = b.move_right(b.board, b.loc)
     elif key == keyboard.Key.down:
-        b.move_down()
+        b.board, b.loc = b.move_down(b.board, b.loc)
     elif key == keyboard.Key.left:
-        b.move_left()
+        b.board, b.loc = b.move_left(b.board, b.loc)
+
+    # Shift key solves the game and quits
+    elif key == keyboard.Key.shift:
+        print("Thinking...")
+        sleep(1)
+        moves = b.solve()
+        persist = True
+        for m in moves:
+            b.moves[m](b.board, b.loc)
+            persist = b.refresh()
+            sleep(1)
+        return persist
 
     # Update display on screen to show board after most recent move
     return b.refresh()
