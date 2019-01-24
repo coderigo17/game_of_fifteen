@@ -29,7 +29,11 @@ def on_release(key):
 
     # Escape key solves the game and quits
     if key == keyboard.Key.esc:
-        b.solve()
+        moves = b.solve()
+        print("Here we go... ")
+        print(moves)
+        for m in moves:
+            b.moves[m]()
         return b.refresh()
 
     # User can make moves using the arrow keys
