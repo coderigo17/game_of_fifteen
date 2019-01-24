@@ -1,4 +1,5 @@
 from pynput import keyboard
+from time import sleep
 
 from Board import Board
 
@@ -29,12 +30,14 @@ def on_release(key):
 
     # Escape key solves the game and quits
     if key == keyboard.Key.esc:
+        print("Thinking...")
         moves = b.solve()
-        print("Here we go... ")
-        print(moves)
+        cont = True
         for m in moves:
             b.moves[m]()
-        return b.refresh()
+            cont = b.refresh()
+            sleep(1)
+        return cont
 
     # User can make moves using the arrow keys
     elif key == keyboard.Key.up:

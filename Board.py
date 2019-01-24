@@ -5,7 +5,7 @@ from random import randint, seed
 
 MAX_COL = 4
 MAX_ROW = 4
-SHUFFLE_MAGNITUDE = 10
+SHUFFLE_MAGNITUDE = 20
 
 class Board:
     """Models the board for our game"""
@@ -129,8 +129,6 @@ class Board:
     def solve(self):
         """Solves the game using breadth-first search"""
         #self.board = deepcopy(self.goal)
-
-        print("Thinking...")
 
         def successors(board, loc):
             b_lst = [deepcopy(board), deepcopy(board), deepcopy(board), deepcopy(board)]
